@@ -15,9 +15,7 @@ package com.banzaicloud.metrics.prometheus.client.exporter;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 import io.prometheus.client.Collector;
 import org.slf4j.Logger;
@@ -64,8 +62,17 @@ public class TextFormatWithTimestamp {
     protected static String buildTextFormat(Enumeration<Collector.MetricFamilySamples> mfs,
                                             String timestamp) {
         StringBuilder textFormatBuilder = new StringBuilder();
+        Set<String> metrics = new HashSet<>();
 
         for (Collector.MetricFamilySamples metricFamilySamples : Collections.list(mfs)) {
+            // Modify mark
+            // INFO PushGatewayWithTimestamp: text format parsing error in line 64: second HELP line for metric name "HiveExternalCatalog_fileCacheHits"
+            // remove duplicate metric
+            if (metrics.contains(metricFamilySamples.name)) {
+                continue;
+            }
+            metrics.add(metricFamilySamples.name);
+
             appendHelp(textFormatBuilder, metricFamilySamples.name, metricFamilySamples.help);
             appendType(textFormatBuilder, metricFamilySamples.name, metricFamilySamples.type);
 

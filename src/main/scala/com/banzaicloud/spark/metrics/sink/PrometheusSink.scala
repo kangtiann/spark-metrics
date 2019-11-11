@@ -38,6 +38,7 @@ import org.apache.spark.{SecurityManager, SparkConf, SparkEnv}
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 import scala.util.matching.Regex
+import io.prometheus.client.Collector.sanitizeMetricName
 
 
 class PrometheusSink(
@@ -278,7 +279,7 @@ class PrometheusSink(
 
   private def parseLabel(label: String): (String, String) = {
     label match {
-      case lbv(label, value) => (DropwizardExports.sanitizeMetricName(label), value)
+      case lbv(label, value) => (sanitizeMetricName(label), value)
       case _ =>
         throw new IllegalArgumentException("Can not parse labels ! Labels should be in label=value separated by commas format.")
     }
